@@ -1,0 +1,14 @@
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+h1 {
+    text-align: center;
+}
+
+button {
+    padding: 10px;
+    margin-bottom: 10px;
+}

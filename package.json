@@ -1,0 +1,26 @@
+{
+    "name": "rideshare-connect",
+    "version": "1.0.0",
+    "description": "Decentralized Ridesharing Platform",
+    "main": "index.js",
+    "scripts": {
+      "dev": "http-server -c-1 ./frontend"
+    },
+    "keywords": [
+      "decentralized",
+      "ridesharing",
+      "blockchain",
+      "ethereum",
+      "truffle"
+    ],
+    "author": "Your Name",
+    "license": "MIT",
+    "dependencies": {
+      "http-server": "^0.12.3"
+    },
+    "devDependencies": {},
+    "engines": {
+      "node": ">=10.0.0"
+    }
+  }
+  
