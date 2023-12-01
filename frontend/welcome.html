@@ -1,0 +1,29 @@
+<!-- welcome.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Welcome to RideShare Connect</title>
+</head>
+<body>
+    <h1>Welcome to RideShare Connect</h1>
+
+    <div id="welcomeScreen">
+        <p>Hello <span id="welcomeUsername"></span>!</p>
+        <button id="logoutButton">Logout</button>
+    </div>
+
+    <script src="web3.min.js"></script>
+    <script src="truffle-contract.js"></script>
+    <script src="app.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            // Update MetaMask status when the welcome screen is loaded
+            App.updateMetaMaskStatus();
+        });
+    </script>
+</body>
+</html>

@@ -20,6 +20,9 @@ contract RideShareConnect {
 
     // Function to sign up as a customer
     function signupCustomer(string memory _username, string memory _password) public {
+        // Check if the sender's address matches the MetaMask account
+        require(msg.sender == tx.origin, "Invalid sender");
+        // The rest of the logic
         require(bytes(_username).length > 0, "Username cannot be empty");
         require(bytes(_password).length > 0, "Password cannot be empty");
         require(users[msg.sender].isDriver == false, "Already signed up as a driver");

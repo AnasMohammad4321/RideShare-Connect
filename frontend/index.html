@@ -21,9 +21,14 @@
         <input type="password" id="password" placeholder="Enter your password">
         <br>
         <button onclick="signup('customer')">Sign Up as User</button>
-        <button onclick="signup('driver')">Sign Up as Driver</button>
         <br>
         <button onclick="login()">Login</button>
+    </div>
+
+    <div id="welcomeScreen" style="display: none;">
+        <p id="welcomeMessage"></p>
+        <p>Hello <span id="welcomeUsername"></span>!</p>
+        <button id="logoutButton">Logout</button>
     </div>
 
     <script src="web3.min.js"></script>
@@ -43,8 +48,6 @@
         async function signup(userType) {
             if (userType === 'customer') {
                 await App.signupCustomer();
-            } else if (userType === 'driver') {
-                await App.signupDriver();
             }
         }
 
