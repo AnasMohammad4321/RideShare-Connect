@@ -81,7 +81,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -110,7 +111,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -141,7 +143,8 @@
       "name": "bookRide",
       "outputs": [],
       "stateMutability": "payable",
-      "type": "function"
+      "type": "function",
+      "payable": true
     },
     {
       "inputs": [
@@ -7023,9 +7026,17 @@
     "name": "solc",
     "version": "0.8.0+commit.c7dfd78e.Emscripten.clang"
   },
-  "networks": {},
+  "networks": {
+    "5777": {
+      "events": {},
+      "links": {},
+      "address": "0x002B9CAFA08A073a143D66b8328A35F8D2B70715",
+      "transactionHash": "0x0dd8a1301a033f20137d4410b196cc102d573acd60eb808603baad787f33deeb"
+    }
+  },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2023-12-01T17:20:34.657Z",
+  "updatedAt": "2023-12-01T17:30:32.427Z",
+  "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
     "methods": {},
