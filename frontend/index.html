@@ -5,34 +5,108 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
-    <title>RideShare Connect - Signup/Login</title>
+    <title>RideShare Connect</title>
 </head>
 <body>
     <h1>RideShare Connect</h1>
 
-    <h2>User Signup</h2>
-    <label for="username">Username:</label>
-    <input type="text" id="username" placeholder="Enter your username">
+    <div id="metamaskStatus"></div>
 
-    <label for="email">Email:</label>
-    <input type="email" id="email" placeholder="Enter your email">
-
-    <label for="password">Password:</label>
-    <input type="password" id="password" placeholder="Enter your password">
-
-    <button onclick="signUpAsDriver()">Sign Up as Driver</button>
-    <button onclick="signUpAsPassenger()">Sign Up as Passenger</button>
-
-    <h2>User Signin</h2>
-    <label for="signInUsername">Username:</label>
-    <input type="text" id="signInUsername" placeholder="Enter your username">
-
-    <label for="signInPassword">Password:</label>
-    <input type="password" id="signInPassword" placeholder="Enter your password">
-
-    <button onclick="signIn()">Sign In</button>
+    <div id="authSection">
+        <h2>User Authentication</h2>
+        <label for="username">Username:</label>
+        <input type="text" id="username" placeholder="Enter your username">
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" placeholder="Enter your password">
+        <br>
+        <button onclick="signup('customer')">Sign Up as User</button>
+        <button onclick="signup('driver')">Sign Up as Driver</button>
+        <br>
+        <button onclick="login()">Login</button>
+    </div>
 
     <script src="web3.min.js"></script>
+    <script src="truffle-contract.js"></script>
     <script src="app.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            // Check if MetaMask is installed
+            if (window.ethereum) {
+                document.getElementById('metamaskStatus').innerText = 'MetaMask is installed!';
+            } else {
+                document.getElementById('metamaskStatus').innerText = 'MetaMask is not installed. Please install it from <a href="https://metamask.io/" target="_blank">here</a>.';
+            }
+        });
+
+        async function signup(userType) {
+            if (userType === 'customer') {
+                await App.signupCustomer();
+            } else if (userType === 'driver') {
+                await App.signupDriver();
+            }
+        }
+
+        async function login() {
+            await App.signin();
+        }
+    </script>
+</body>
+</html>
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>RideShare Connect</title>
+</head>
+<body>
+    <h1>RideShare Connect</h1>
+
+    <div id="metamaskStatus"></div>
+
+    <div id="authSection">
+        <h2>User Authentication</h2>
+        <label for="username">Username:</label>
+        <input type="text" id="username" placeholder="Enter your username">
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" placeholder="Enter your password">
+        <br>
+        <button onclick="signup('customer')">Sign Up as User</button>
+        <button onclick="signup('driver')">Sign Up as Driver</button>
+        <br>
+        <button onclick="login()">Login</button>
+    </div>
+
+    <script src="web3.min.js"></script>
+    <script src="truffle-contract.js"></script>
+    <script src="app.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            // Check if MetaMask is installed
+            if (window.ethereum) {
+                document.getElementById('metamaskStatus').innerText = 'MetaMask is installed!';
+            } else {
+                document.getElementById('metamaskStatus').innerText = 'MetaMask is not installed. Please install it from <a href="https://metamask.io/" target="_blank">here</a>.';
+            }
+        });
+
+        async function signup(userType) {
+            if (userType === 'customer') {
+                await App.signupCustomer();
+            } else if (userType === 'driver') {
+                await App.signupDriver();
+            }
+        }
+
+        async function login() {
+            await App.signin();
+        }
+    </script>
 </body>
 </html>

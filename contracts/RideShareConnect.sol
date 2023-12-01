@@ -2,93 +2,74 @@
 pragma solidity ^0.8.0;
 
 contract RideShareConnect {
-    address public owner;
-    uint public rideCount;
-
-    struct Ride {
-        address driver;
-        uint availableSeats;
-        uint seatPrice;
-        bool isActive;
-        mapping(address => bool) passengers;
+    // Define a struct to represent user data
+    struct User {
+        bool isDriver;
+        string username;
+        string password; // Note: In a production environment, passwords should be securely hashed.
+        string carRegistration;
+        uint256 numberOfSeats;
+        uint256 seatPrice;
     }
 
-    mapping(uint => Ride) public rides;
+    // Mapping to store user data
+    mapping(address => User) public users;
 
-    event RideStarted(uint rideId, address driver, uint availableSeats, uint seatPrice);
-    event RideBooked(uint rideId, address passenger, uint seatPrice);
-    event RideCompleted(uint rideId, address driver, uint totalEarned);
+    // Event to log user signup
+    event UserSignup(address indexed userAddress, string username, bool isDriver);
 
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Only the owner can call this function");
-        _;
+    // Function to sign up as a customer
+    function signupCustomer(string memory _username, string memory _password) public {
+        require(bytes(_username).length > 0, "Username cannot be empty");
+        require(bytes(_password).length > 0, "Password cannot be empty");
+        require(users[msg.sender].isDriver == false, "Already signed up as a driver");
+
+        users[msg.sender] = User({
+            isDriver: false,
+            username: _username,
+            password: _password,
+            carRegistration: "",
+            numberOfSeats: 0,
+            seatPrice: 0
+        });
+
+        emit UserSignup(msg.sender, _username, false);
     }
 
-    modifier rideExists(uint _rideId) {
-        require(_rideId < rideCount, "Ride does not exist");
-        _;
+    // Function to sign up as a driver
+    function signupDriver(
+        string memory _username,
+        string memory _password,
+        string memory _carRegistration,
+        uint256 _numberOfSeats,
+        uint256 _seatPrice
+    ) public {
+        require(bytes(_username).length > 0, "Username cannot be empty");
+        require(bytes(_password).length > 0, "Password cannot be empty");
+        require(bytes(_carRegistration).length > 0, "Car registration cannot be empty");
+        require(_numberOfSeats > 0, "Number of seats must be greater than 0");
+        require(_seatPrice > 0, "Seat price must be greater than 0");
+        require(users[msg.sender].isDriver == false, "Already signed up as a customer");
+
+        users[msg.sender] = User({
+            isDriver: true,
+            username: _username,
+            password: _password,
+            carRegistration: _carRegistration,
+            numberOfSeats: _numberOfSeats,
+            seatPrice: _seatPrice
+        });
+
+        emit UserSignup(msg.sender, _username, true);
     }
 
-    modifier rideNotActive(uint _rideId) {
-        require(!rides[_rideId].isActive, "Ride is already active");
-        _;
-    }
+    // Function to sign in
+    function signin(string memory _username, string memory _password) public view returns (bool) {
+        require(bytes(_username).length > 0, "Username cannot be empty");
+        require(bytes(_password).length > 0, "Password cannot be empty");
 
-    modifier rideActive(uint _rideId) {
-        require(rides[_rideId].isActive, "Ride is not active");
-        _;
-    }
-
-    modifier enoughSeatsAvailable(uint _rideId) {
-        require(rides[_rideId].availableSeats > 0, "No available seats");
-        _;
-    }
-
-    constructor() {
-        owner = msg.sender;
-    }
-
-    function signUpAsDriver(uint _availableSeats, uint _seatPrice) external {
-        // Ensure the user is not already a driver
-        require(!rides[rideCount].isActive, "You are already a driver for an active ride");
-
-        Ride storage newRide = rides[rideCount];
-        newRide.driver = msg.sender;
-        newRide.availableSeats = _availableSeats;
-        newRide.seatPrice = _seatPrice;
-        newRide.isActive = false;
-
-        rideCount++;
-
-        emit RideStarted(rideCount - 1, msg.sender, _availableSeats, _seatPrice);
-    }
-
-    function signUpAsPassenger(uint _rideId) external rideExists(_rideId) rideNotActive(_rideId) enoughSeatsAvailable(_rideId) {
-        Ride storage ride = rides[_rideId];
-        require(!ride.passengers[msg.sender], "You are already a passenger in this ride");
-
-        ride.passengers[msg.sender] = true;
-        ride.availableSeats--;
-
-        emit RideBooked(_rideId, msg.sender, ride.seatPrice);
-    }
-
-    function startRide(uint _rideId) external onlyOwner rideExists(_rideId) rideNotActive(_rideId) {
-        rides[_rideId].isActive = true;
-    }
-
-    function completeRide(uint _rideId) external onlyOwner rideExists(_rideId) rideActive(_rideId) {
-        Ride storage ride = rides[_rideId];
-
-        uint totalEarned = ride.availableSeats * ride.seatPrice;
-        payable(ride.driver).transfer(totalEarned);
-
-        emit RideCompleted(_rideId, ride.driver, totalEarned);
-
-        // Reset the ride
-        delete ride.driver;
-        ride.availableSeats = 0;
-        ride.seatPrice = 0;
-        ride.isActive = false;
+        User storage user = users[msg.sender];
+        return keccak256(bytes(user.username)) == keccak256(bytes(_username)) &&
+               keccak256(bytes(user.password)) == keccak256(bytes(_password));
     }
 }
