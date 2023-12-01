@@ -106,29 +106,53 @@ App = {
     
 
     signupCustomer: async () => {
+    try {
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
 
-        try {
-            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-            const selectedAccount = accounts[0];
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        const selectedAccount = accounts[0];
 
-            await App.contracts.RideShareConnect.deployed().then(async (instance) => {
-                await instance.signupCustomer(username, password, { from: selectedAccount });
-                console.log('User signed up as customer:', username);
-
-                // Update account and username
-                App.account = selectedAccount;
-                App.username = username;
-
-                // Render the welcome screen with a success message
-                await App.renderWelcomeScreen('Signup successful!');
-            });
-        } catch (error) {
-            console.error('Error during signup:', error);
-            // Render the welcome screen with an error message
-            await App.renderWelcomeScreen('Signup failed. Please try again.');
+        if (!username || !password) {
+            console.error('Username or password is empty');
+            return;
         }
+
+        await App.contracts.RideShareConnect.deployed().then(async (instance) => {
+            await instance.signupCustomer(username, password, { from: selectedAccount });
+            console.log('User signed up as customer:', username);
+
+            // Update account and username
+            App.account = selectedAccount;
+            App.username = username;
+
+            // Render the welcome screen with a success message
+            await App.renderWelcomeScreen('Signup successful!');
+        });
+    } catch (error) {
+        console.error('Error during signup:', error);
+        // Render the welcome screen with an error message
+        await App.renderSignUpFailedScreen('Signup failed. Please try again.');
+    }
+},
+
+
+    renderSignUpFailedScreen: async (message) => {
+        // Load the sign up failed screen after failed signup
+        const welcomeScreen = document.getElementById('SignUpFailedScreen');
+        welcomeScreen.style.display = 'block';
+
+        // Display the message on the welcome screen
+        const welcomeMessage = document.getElementById('SignUpFailedMessage');
+        welcomeMessage.innerText = message;
+
+        // Add event listener for the logout button
+        const logoutButton = document.getElementById('TryAgainButton');
+        logoutButton.addEventListener('click', App.load_main_screen);
+
+        // Hide the signup/login screen
+        const authSection = document.getElementById('authSection');
+        authSection.style.display = 'none';
     },
 
     renderWelcomeScreen: async (message) => {
@@ -154,24 +178,49 @@ App = {
     },
 
     signin: async () => {
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-
-        await App.contracts.RideShareConnect.deployed().then(async (instance) => {
-            const isSignedIn = await instance.signin(username, password, { from: App.account });
+        try {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+    
+            const isSignedIn = await App.contracts.RideShareConnect.deployed().then(instance =>
+                instance.signin(username, password, { from: App.account })
+            );
+    
             if (isSignedIn) {
                 console.log('User signed in:', username);
+                // Call renderWelcomeScreen or any other logic
             } else {
                 console.log('Invalid username or password');
             }
-        });
-
+        } catch (error) {
+            console.error('Error during signin:', error);
+        }
+    
+        // Call App.render() or any other necessary functions after signin
         await App.render();
     },
+    
 
     logout: async () => {
         // Log out the user and navigate back to the signup/login screen
         const welcomeScreen = document.getElementById('welcomeScreen');
+        welcomeScreen.style.display = 'none';
+
+        // Reset username and account
+        App.username = null;
+        App.account = null;
+
+        // Show signup/login screen
+        const authSection = document.getElementById('authSection');
+        authSection.style.display = 'block';
+
+        // Update MetaMask status
+        App.updateMetaMaskStatus();
+    },
+
+    load_main_screen: async () => {
+        // Log out the user and navigate back to the signup/login screen
+        const welcomeScreen = document.getElementById('SignUpFailedScreen');
         welcomeScreen.style.display = 'none';
 
         // Reset username and account

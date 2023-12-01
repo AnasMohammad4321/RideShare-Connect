@@ -20,7 +20,7 @@
         <label for="password">Password:</label>
         <input type="password" id="password" placeholder="Enter your password">
         <br>
-        <button onclick="signup('customer')">Sign Up as User</button>
+        <button onclick="signup('customer')">Sign Up</button>
         <br>
         <button onclick="login()">Login</button>
     </div>
@@ -29,6 +29,11 @@
         <p id="welcomeMessage"></p>
         <p>Hello <span id="welcomeUsername"></span>!</p>
         <button id="logoutButton">Logout</button>
+    </div>
+
+    <div id="SignUpFailedScreen" style="display: none;">
+        <p id="SignUpFailedMessage"></p>
+        <button id="TryAgainButton">Try Again</button>
     </div>
 
     <script src="web3.min.js"></script>
