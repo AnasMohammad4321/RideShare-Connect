@@ -2,54 +2,93 @@
 pragma solidity ^0.8.0;
 
 contract RideShareConnect {
+    address public owner;
+    uint public rideCount;
+
     struct Ride {
         address driver;
-        uint256 availableSeats;
-        uint256 seatPrice;
+        uint availableSeats;
+        uint seatPrice;
+        bool isActive;
         mapping(address => bool) passengers;
     }
 
-    mapping(uint256 => Ride) public rides;
-    uint256 public rideCount;
+    mapping(uint => Ride) public rides;
 
-    event RideStarted(uint256 rideId, address driver, uint256 availableSeats, uint256 seatPrice);
-    event RideBooked(uint256 rideId, address passenger);
-    event RideCancelled(uint256 rideId, address canceller);
+    event RideStarted(uint rideId, address driver, uint availableSeats, uint seatPrice);
+    event RideBooked(uint rideId, address passenger, uint seatPrice);
+    event RideCompleted(uint rideId, address driver, uint totalEarned);
 
-    function startRide(uint256 _availableSeats, uint256 _seatPrice) external {
-        require(_availableSeats > 0, "Invalid number of seats");
-        require(_seatPrice > 0, "Invalid seat price");
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only the owner can call this function");
+        _;
+    }
+
+    modifier rideExists(uint _rideId) {
+        require(_rideId < rideCount, "Ride does not exist");
+        _;
+    }
+
+    modifier rideNotActive(uint _rideId) {
+        require(!rides[_rideId].isActive, "Ride is already active");
+        _;
+    }
+
+    modifier rideActive(uint _rideId) {
+        require(rides[_rideId].isActive, "Ride is not active");
+        _;
+    }
+
+    modifier enoughSeatsAvailable(uint _rideId) {
+        require(rides[_rideId].availableSeats > 0, "No available seats");
+        _;
+    }
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    function signUpAsDriver(uint _availableSeats, uint _seatPrice) external {
+        // Ensure the user is not already a driver
+        require(!rides[rideCount].isActive, "You are already a driver for an active ride");
 
         Ride storage newRide = rides[rideCount];
         newRide.driver = msg.sender;
         newRide.availableSeats = _availableSeats;
         newRide.seatPrice = _seatPrice;
+        newRide.isActive = false;
 
-        emit RideStarted(rideCount, msg.sender, _availableSeats, _seatPrice);
         rideCount++;
+
+        emit RideStarted(rideCount - 1, msg.sender, _availableSeats, _seatPrice);
     }
 
-    function bookRide(uint256 _rideId) external payable {
-        require(_rideId < rideCount, "Ride does not exist");
+    function signUpAsPassenger(uint _rideId) external rideExists(_rideId) rideNotActive(_rideId) enoughSeatsAvailable(_rideId) {
         Ride storage ride = rides[_rideId];
-        require(ride.availableSeats > 0, "No available seats");
-        require(msg.value == ride.seatPrice, "Incorrect payment amount");
-        require(!ride.passengers[msg.sender], "Already booked");
+        require(!ride.passengers[msg.sender], "You are already a passenger in this ride");
 
         ride.passengers[msg.sender] = true;
         ride.availableSeats--;
 
-        emit RideBooked(_rideId, msg.sender);
+        emit RideBooked(_rideId, msg.sender, ride.seatPrice);
     }
 
-    function cancelBooking(uint256 _rideId) external {
-        require(_rideId < rideCount, "Ride does not exist");
+    function startRide(uint _rideId) external onlyOwner rideExists(_rideId) rideNotActive(_rideId) {
+        rides[_rideId].isActive = true;
+    }
+
+    function completeRide(uint _rideId) external onlyOwner rideExists(_rideId) rideActive(_rideId) {
         Ride storage ride = rides[_rideId];
-        require(ride.passengers[msg.sender], "Not booked on this ride");
 
-        ride.passengers[msg.sender] = false;
-        ride.availableSeats++;
+        uint totalEarned = ride.availableSeats * ride.seatPrice;
+        payable(ride.driver).transfer(totalEarned);
 
-        emit RideCancelled(_rideId, msg.sender);
+        emit RideCompleted(_rideId, ride.driver, totalEarned);
+
+        // Reset the ride
+        delete ride.driver;
+        ride.availableSeats = 0;
+        ride.seatPrice = 0;
+        ride.isActive = false;
     }
 }

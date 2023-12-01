@@ -1,4 +1,3 @@
-// app.js
 document.addEventListener('DOMContentLoaded', function () {
     initWeb3();
     loadRides();
@@ -15,15 +14,51 @@ async function initWeb3() {
     }
 }
 
-async function startRide() {
+async function signUpAsDriver(availableSeats, seatPrice) {
     const rideContract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
 
     try {
         const accounts = await web3.eth.getAccounts();
-        await rideContract.methods.startRide(3, web3.utils.toWei('0.1', 'ether')).send({ from: accounts[0] });
+        await rideContract.methods.signUpAsDriver(availableSeats, web3.utils.toWei(seatPrice.toString(), 'ether')).send({ from: accounts[0] });
+        loadRides();
+    } catch (error) {
+        console.error('Error signing up as driver:', error);
+    }
+}
+
+async function signUpAsPassenger(rideId) {
+    const rideContract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
+
+    try {
+        const accounts = await web3.eth.getAccounts();
+        await rideContract.methods.signUpAsPassenger(rideId).send({ from: accounts[0] });
+        loadRides();
+    } catch (error) {
+        console.error('Error signing up as passenger:', error);
+    }
+}
+
+async function startRide(rideId) {
+    const rideContract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
+
+    try {
+        const accounts = await web3.eth.getAccounts();
+        await rideContract.methods.startRide(rideId).send({ from: accounts[0] });
         loadRides();
     } catch (error) {
         console.error('Error starting ride:', error);
+    }
+}
+
+async function completeRide(rideId) {
+    const rideContract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
+
+    try {
+        const accounts = await web3.eth.getAccounts();
+        await rideContract.methods.completeRide(rideId).send({ from: accounts[0] });
+        loadRides();
+    } catch (error) {
+        console.error('Error completing ride:', error);
     }
 }
 
@@ -41,19 +76,10 @@ async function loadRides() {
                                  <p>Driver: ${ride.driver}</p>
                                  <p>Available Seats: ${ride.availableSeats}</p>
                                  <p>Seat Price: ${web3.utils.fromWei(ride.seatPrice, 'ether')} ETH</p>
-                                 <button onclick="bookRide(${i}, ${ride.seatPrice})">Book Ride</button>`;
+                                 <p>Active: ${ride.isActive ? 'Yes' : 'No'}</p>
+                                 <button onclick="signUpAsPassenger(${i})">Sign Up as Passenger</button>
+                                 <button onclick="startRide(${i})" ${ride.isActive ? 'disabled' : ''}>Start Ride</button>
+                                 <button onclick="completeRide(${i})" ${!ride.isActive ? 'disabled' : ''}>Complete Ride</button>`;
         ridesList.appendChild(rideElement);
-    }
-}
-
-async function bookRide(rideId, seatPrice) {
-    const rideContract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
-
-    try {
-        const accounts = await web3.eth.getAccounts();
-        await rideContract.methods.bookRide(rideId).send({ from: accounts[0], value: seatPrice });
-        loadRides();
-    } catch (error) {
-        console.error('Error booking ride:', error);
     }
 }
