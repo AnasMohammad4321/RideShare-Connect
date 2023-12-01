@@ -18,14 +18,10 @@ contract RideShareConnect {
     // Event to log user signup
     event UserSignup(address indexed userAddress, string username, bool isDriver);
 
-    // Function to sign up as a customer
+    /// Function to sign up as a customer
     function signupCustomer(string memory _username, string memory _password) public {
-        // Check if the sender's address matches the MetaMask account
-        require(msg.sender == tx.origin, "Invalid sender");
-        // The rest of the logic
         require(bytes(_username).length > 0, "Username cannot be empty");
         require(bytes(_password).length > 0, "Password cannot be empty");
-        require(users[msg.sender].isDriver == false, "Already signed up as a driver");
 
         users[msg.sender] = User({
             isDriver: false,
@@ -39,32 +35,6 @@ contract RideShareConnect {
         emit UserSignup(msg.sender, _username, false);
     }
 
-    // Function to sign up as a driver
-    function signupDriver(
-        string memory _username,
-        string memory _password,
-        string memory _carRegistration,
-        uint256 _numberOfSeats,
-        uint256 _seatPrice
-    ) public {
-        require(bytes(_username).length > 0, "Username cannot be empty");
-        require(bytes(_password).length > 0, "Password cannot be empty");
-        require(bytes(_carRegistration).length > 0, "Car registration cannot be empty");
-        require(_numberOfSeats > 0, "Number of seats must be greater than 0");
-        require(_seatPrice > 0, "Seat price must be greater than 0");
-        require(users[msg.sender].isDriver == false, "Already signed up as a customer");
-
-        users[msg.sender] = User({
-            isDriver: true,
-            username: _username,
-            password: _password,
-            carRegistration: _carRegistration,
-            numberOfSeats: _numberOfSeats,
-            seatPrice: _seatPrice
-        });
-
-        emit UserSignup(msg.sender, _username, true);
-    }
 
     // Function to sign in
     function signin(string memory _username, string memory _password) public view returns (bool) {

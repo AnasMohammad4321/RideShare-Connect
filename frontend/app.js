@@ -106,35 +106,59 @@ App = {
     
 
     signupCustomer: async () => {
-    try {
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
+        try {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
 
-        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        const selectedAccount = accounts[0];
+            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+            const selectedAccount = accounts[0];
 
-        if (!username || !password) {
-            console.error('Username or password is empty');
-            return;
+            if (!username || !password) {
+                console.error('Username or password is empty');
+                return;
+            }
+
+            await App.contracts.RideShareConnect.deployed().then(async (instance) => {
+                await instance.signupCustomer(username, password, { from: selectedAccount });
+                console.log('User signed up as customer:', username);
+
+                // Update account and username
+                App.account = selectedAccount;
+                App.username = username;
+
+                // Render the welcome screen with a success message
+                await App.renderWelcomeScreen('Signup successful!');
+            });
+        } catch (error) {
+            console.error('Error during signup:', error);
+            // Render the welcome screen with an error message
+            await App.renderSignUpFailedScreen('Signup failed. Please try again.');
+        }
+    },
+
+
+    signin: async () => {
+        try {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const instance = await App.contracts.RideShareConnect.deployed();
+            const isSignedIn = await instance.signin(username, password, { from: App.account });
+
+            if (isSignedIn) {
+                console.log('User signed in:', username);
+                // Call renderWelcomeScreen or any other logic
+                await App.renderWelcomeScreen('Login successful!');
+            } else {
+                console.log('Invalid username or password');
+            }
+        } catch (error) {
+            console.error('Error during signin:', error);
         }
 
-        await App.contracts.RideShareConnect.deployed().then(async (instance) => {
-            await instance.signupCustomer(username, password, { from: selectedAccount });
-            console.log('User signed up as customer:', username);
-
-            // Update account and username
-            App.account = selectedAccount;
-            App.username = username;
-
-            // Render the welcome screen with a success message
-            await App.renderWelcomeScreen('Signup successful!');
-        });
-    } catch (error) {
-        console.error('Error during signup:', error);
-        // Render the welcome screen with an error message
-        await App.renderSignUpFailedScreen('Signup failed. Please try again.');
-    }
-},
+        // Call App.render() or any other necessary functions after signin
+        await App.render();
+    },
 
 
     renderSignUpFailedScreen: async (message) => {
@@ -175,29 +199,6 @@ App = {
         // Hide the signup/login screen
         const authSection = document.getElementById('authSection');
         authSection.style.display = 'none';
-    },
-
-    signin: async () => {
-        try {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-    
-            const isSignedIn = await App.contracts.RideShareConnect.deployed().then(instance =>
-                instance.signin(username, password, { from: App.account })
-            );
-    
-            if (isSignedIn) {
-                console.log('User signed in:', username);
-                // Call renderWelcomeScreen or any other logic
-            } else {
-                console.log('Invalid username or password');
-            }
-        } catch (error) {
-            console.error('Error during signin:', error);
-        }
-    
-        // Call App.render() or any other necessary functions after signin
-        await App.render();
     },
     
 
