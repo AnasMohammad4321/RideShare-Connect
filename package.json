@@ -4,23 +4,22 @@
     "description": "Decentralized Ridesharing Platform",
     "main": "index.js",
     "scripts": {
-      "dev": "http-server -c-1 ./frontend"
+        "dev": "http-server -c-1 ./frontend"
     },
     "keywords": [
-      "decentralized",
-      "ridesharing",
-      "blockchain",
-      "ethereum",
-      "truffle"
+        "decentralized",
+        "ridesharing",
+        "blockchain",
+        "ethereum",
+        "truffle"
     ],
     "author": "Mohammad Anas",
     "license": "MIT",
     "dependencies": {
-      "http-server": "^0.12.3"
+        "http-server": "^0.12.3",
+        "truffle-contract": "^4.0.31"
     },
-    "devDependencies": {},
     "engines": {
-      "node": ">=10.0.0"
+        "node": ">=10.0.0"
     }
-  }
-  
+}
