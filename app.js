@@ -17,27 +17,28 @@ App = {
     loadWeb3: async () => {
         if (typeof web3 !== 'undefined') {
             App.web3Provider = web3.currentProvider;
-            web3 = new Web3(web3.currentProvider);
+            window.web3 = new Web3(web3.currentProvider);
         } else {
             window.alert("Please connect to Metamask.");
         }
-
+    
         if (window.ethereum) {
             window.web3 = new Web3(ethereum);
             try {
                 await ethereum.enable();
-                web3.eth.sendTransaction({/* ... */});
+                // web3.eth.sendTransaction({/* ... */}); // Commented out, not necessary
             } catch (error) {
                 console.error('User denied account access:', error);
             }
         } else if (window.web3) {
             App.web3Provider = web3.currentProvider;
             window.web3 = new Web3(web3.currentProvider);
-            web3.eth.sendTransaction({/* ... */});
+            // web3.eth.sendTransaction({/* ... */}); // Commented out, not necessary
         } else {
             console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
         }
     },
+    
 
     handleAccountChange: async () => {
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
@@ -52,89 +53,72 @@ App = {
     },
 
     loadContract: async () => {
-        // Load your smart contract here using its ABI and address
-        const RideShareConnectContract = await $.getJSON('RideShareConnect.json');
-        App.contracts.RideShareConnect = TruffleContract(RideShareConnectContract);
-        App.contracts.RideShareConnect.setProvider(App.web3Provider);
-
-        // Example: call smart contract functions after loading
-        // await App.contracts.RideShareConnect.deployed().then(async (instance) => {
-        //     await instance.signupCustomer("customerUsername", "customerPassword");
-        // });
-    },
-
+        try {
+            // Load your smart contract here using its ABI and address
+            const response = await fetch('build/contracts/RideShareConnect.json');
+            if (!response.ok) {
+                throw new Error(`Failed to fetch contract data (${response.status} ${response.statusText})`);
+            }
+    
+            const contractData = await response.json();
+            const abi = contractData.abi;
+    
+            if (!abi) {
+                throw new Error('ABI not found in the contract data');
+            }
+    
+            const networks = contractData.networks;
+            const networkId = Object.keys(networks)[0]; // Assuming there is only one network
+    
+            const RideShareConnectContract = new web3.eth.Contract(abi, networks[networkId].address);
+            App.contracts.RideShareConnect = RideShareConnectContract;
+    
+            // Example: call smart contract functions after loading
+            // await App.contracts.RideShareConnect.methods.signupCustomer("customerUsername", "customerPassword").send({ from: App.account });
+        } catch (error) {
+            console.error('Error loading contract:', error);
+        }
+    },    
+    
     render: async () => {
-        // Display the current account
-        document.getElementById('account').innerText = App.account;
-    
-        // Check if the user is signed in
-        const isSignedIn = await App.contracts.RideShareConnect.deployed().then(instance =>
-            instance.isSignedIn({ from: App.account })
-        );
-    
-        if (isSignedIn) {
-            // Display user-specific content for a signed-in user
-            document.getElementById('userStatus').innerText = 'Signed In';
-        } else {
-            // Display user-specific content for a user who is not signed in
-            document.getElementById('userStatus').innerText = 'Not Signed In';
-        }
-    
-        // Example: Display the available seats in the carpool
-        const availableSeats = await App.contracts.RideShareConnect.deployed().then(instance =>
-            instance.getAvailableSeats({ from: App.account })
-        );
-    
-        document.getElementById('availableSeats').innerText = availableSeats.toString();
-    
-        // You can add more rendering logic based on your UI requirements
-    
-        // Example: Display a button to sign up as a customer if the user is not signed in
-        if (!isSignedIn) {
-            document.getElementById('signupCustomerButton').style.display = 'block';
-        } else {
-            document.getElementById('signupCustomerButton').style.display = 'none';
-        }
-    
-        // Example: Display a button to sign up as a driver if the user is not signed in
-        if (!isSignedIn) {
-            document.getElementById('signupDriverButton').style.display = 'block';
-        } else {
-            document.getElementById('signupDriverButton').style.display = 'none';
-        }
-    },
+        const welcomeScreen = document.getElementById('authSection');
+        welcomeScreen.style.display = 'block';
+        // App.signupCustomer();
+    },    
     
 
     signupCustomer: async () => {
         try {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-
+    
             const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
             const selectedAccount = accounts[0];
-
+    
             if (!username || !password) {
                 console.error('Username or password is empty');
                 return;
             }
-
-            await App.contracts.RideShareConnect.deployed().then(async (instance) => {
-                await instance.signupCustomer(username, password, { from: selectedAccount });
-                console.log('User signed up as customer:', username);
-
-                // Update account and username
-                App.account = selectedAccount;
-                App.username = username;
-
-                // Render the welcome screen with a success message
-                await App.renderWelcomeScreen('Signup successful!');
-            });
+    
+            // Use new web3.eth.Contract to create an instance of the contract
+            const RideShareConnectContract = new web3.eth.Contract(App.contracts.RideShareConnect.abi, App.contracts.RideShareConnect.address);
+            // Assuming your contract has a method named signupCustomer
+            await RideShareConnectContract.methods.signupCustomer(username, password).send({ from: selectedAccount });
+    
+            console.log('User signed up as customer:', username);
+    
+            // Update account and username
+            App.account = selectedAccount;
+            App.username = username;
+    
+            // Render the welcome screen with a success message
+            await App.renderWelcomeScreen('Signup successful!');
         } catch (error) {
             console.error('Error during signup:', error);
             // Render the welcome screen with an error message
             await App.renderSignUpFailedScreen('Signup failed. Please try again.');
         }
-    },
+    },    
 
 
     signin: async () => {
@@ -248,4 +232,5 @@ App = {
 
 document.addEventListener('DOMContentLoaded', () => {
     App.load();
+    console.log("RUNNING ALL")
 });

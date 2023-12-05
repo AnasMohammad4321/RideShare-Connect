@@ -4,7 +4,7 @@
     "description": "Decentralized Ridesharing Platform",
     "main": "index.js",
     "scripts": {
-      "dev": "http-server -c-1 ./frontend"
+      "dev": "http-server -c-1"
     },
     "keywords": [
       "decentralized",

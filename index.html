@@ -8,7 +8,6 @@
     <title>RideShare Connect</title>
 </head>
 <body>
-    <h1>RideShare Connect</h1>
 
     <div id="metamaskStatus"></div>
 
@@ -20,7 +19,7 @@
         <label for="password">Password:</label>
         <input type="password" id="password" placeholder="Enter your password">
         <br>
-        <button onclick="signup('customer')">Sign Up</button>
+        <button id = signup onclick="signup('customer')">Sign Up</button>
         <br>
         <button onclick="login()">Login</button>
     </div>
@@ -36,7 +35,8 @@
         <button id="TryAgainButton">Try Again</button>
     </div>
 
-    <script src="web3.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.3.6/dist/web3.min.js"></script>
     <script src="truffle-contract.js"></script>
     <script src="app.js"></script>
 
@@ -46,53 +46,12 @@
             if (window.ethereum) {
                 document.getElementById('metamaskStatus').innerText = 'MetaMask is installed!';
             } else {
-                document.getElementById('metamaskStatus').innerText = 'MetaMask is not installed. Please install it from <a href="https://metamask.io/" target="_blank">here</a>.';
+                document.getElementById('metamaskStatus').innerHTML = 'MetaMask is not installed. Please install it from <a href="https://metamask.io/" target="_blank">here</a>.';
             }
         });
 
         async function signup(userType) {
-            if (userType === 'customer') {
-                await App.signupCustomer();
-            }
-        }
-
-        async function login() {
-            await App.signin();
-        }
-    </script>
-</body>
-</html>
-<!-- index.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <title>RideShare Connect</title>
-</head>
-<body>
-
-    <script src="web3.min.js"></script>
-    <script src="truffle-contract.js"></script>
-    <script src="app.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', async function () {
-            // Check if MetaMask is installed
-            if (window.ethereum) {
-                document.getElementById('metamaskStatus').innerText = 'MetaMask is installed!';
-            } else {
-                document.getElementById('metamaskStatus').innerText = 'MetaMask is not installed. Please install it from <a href="https://metamask.io/" target="_blank">here</a>.';
-            }
-        });
-
-        async function signup(userType) {
-            if (userType === 'customer') {
-                await App.signupCustomer();
-            } else if (userType === 'driver') {
-                await App.signupDriver();
-            }
+            await App.signupCustomer();
         }
 
         async function login() {
