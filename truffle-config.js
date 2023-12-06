@@ -11,4 +11,6 @@ module.exports = {
       version: "0.8.0", // Ensure this matches the Solidity version in your contracts
     },
   },
+  contracts_directory: './contracts',
+  contracts_build_directory: './build/contracts'
 };

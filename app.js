@@ -61,24 +61,23 @@ App = {
             }
     
             const contractData = await response.json();
-            const abi = contractData.abi;
-    
-            if (!abi) {
-                throw new Error('ABI not found in the contract data');
-            }
-    
+            const abi = contractData.abi; // Ensure ABI is present in your JSON file
             const networks = contractData.networks;
             const networkId = Object.keys(networks)[0]; // Assuming there is only one network
     
             const RideShareConnectContract = new web3.eth.Contract(abi, networks[networkId].address);
             App.contracts.RideShareConnect = RideShareConnectContract;
     
+            // Log contract ABI and address for debugging
+            console.log("Contract ABI:", abi);
+            console.log("Contract Address:", networks[networkId].address);
+    
             // Example: call smart contract functions after loading
             // await App.contracts.RideShareConnect.methods.signupCustomer("customerUsername", "customerPassword").send({ from: App.account });
         } catch (error) {
             console.error('Error loading contract:', error);
         }
-    },    
+    },            
     
     render: async () => {
         const welcomeScreen = document.getElementById('authSection');
@@ -100,8 +99,9 @@ App = {
                 return;
             }
     
-            // Use new web3.eth.Contract to create an instance of the contract
+            // Use the ABI directly from the loaded contract
             const RideShareConnectContract = new web3.eth.Contract(App.contracts.RideShareConnect.abi, App.contracts.RideShareConnect.address);
+    
             // Assuming your contract has a method named signupCustomer
             await RideShareConnectContract.methods.signupCustomer(username, password).send({ from: selectedAccount });
     
@@ -118,7 +118,7 @@ App = {
             // Render the welcome screen with an error message
             await App.renderSignUpFailedScreen('Signup failed. Please try again.');
         }
-    },    
+    },        
 
 
     signin: async () => {
