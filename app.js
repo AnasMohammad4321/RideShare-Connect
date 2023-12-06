@@ -66,18 +66,11 @@ App = {
             const networkId = Object.keys(networks)[0]; // Assuming there is only one network
     
             const RideShareConnectContract = new web3.eth.Contract(abi, networks[networkId].address);
-            App.contracts.RideShareConnect = RideShareConnectContract;
-    
-            // Log contract ABI and address for debugging
-            console.log("Contract ABI:", abi);
-            console.log("Contract Address:", networks[networkId].address);
-    
-            // Example: call smart contract functions after loading
-            // await App.contracts.RideShareConnect.methods.signupCustomer("customerUsername", "customerPassword").send({ from: App.account });
+            App.contracts.RideShareConnect = { abi, address: networks[networkId].address }; // Store ABI along with the contract address
         } catch (error) {
             console.error('Error loading contract:', error);
         }
-    },            
+    },                    
     
     render: async () => {
         const welcomeScreen = document.getElementById('authSection');
@@ -118,7 +111,7 @@ App = {
             // Render the welcome screen with an error message
             await App.renderSignUpFailedScreen('Signup failed. Please try again.');
         }
-    },        
+    },            
 
 
     signin: async () => {
