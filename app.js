@@ -121,7 +121,7 @@ App = {
     
             const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
             App.account = accounts[0];
-    
+            App.username = username;
             // Use the ABI directly from the loaded contract
             const RideShareConnectContract = new web3.eth.Contract(App.contracts.RideShareConnect.abi, App.contracts.RideShareConnect.address);
     
@@ -140,11 +140,7 @@ App = {
         } catch (error) {
             console.error('Error during signin:', error);
         }
-    
-        // Call App.render() or any other necessary functions after signin
-        await App.render();
     },
-    
 
 
     renderSignUpFailedScreen: async (message) => {
@@ -166,6 +162,10 @@ App = {
     },
 
     renderWelcomeScreen: async (message) => {
+        // Hide the signup/login screen
+        const authSection = document.getElementById('authSection');
+        authSection.style.display = 'none';
+
         // Load the welcome screen after successful signup
         const welcomeScreen = document.getElementById('welcomeScreen');
         welcomeScreen.style.display = 'block';
@@ -181,10 +181,6 @@ App = {
         // Add event listener for the logout button
         const logoutButton = document.getElementById('logoutButton');
         logoutButton.addEventListener('click', App.logout);
-
-        // Hide the signup/login screen
-        const authSection = document.getElementById('authSection');
-        authSection.style.display = 'none';
     },
     
 
