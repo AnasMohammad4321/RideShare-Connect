@@ -118,24 +118,33 @@ App = {
         try {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-
-            const instance = await App.contracts.RideShareConnect.deployed();
-            const isSignedIn = await instance.signin(username, password, { from: App.account });
-
+    
+            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+            App.account = accounts[0];
+    
+            // Use the ABI directly from the loaded contract
+            const RideShareConnectContract = new web3.eth.Contract(App.contracts.RideShareConnect.abi, App.contracts.RideShareConnect.address);
+    
+            // Call the `signin` method in the smart contract
+            const isSignedIn = await RideShareConnectContract.methods.signin(username, password).call({ from: App.account });
+    
             if (isSignedIn) {
                 console.log('User signed in:', username);
                 // Call renderWelcomeScreen or any other logic
                 await App.renderWelcomeScreen('Login successful!');
             } else {
                 console.log('Invalid username or password');
+                // Display an error message for invalid credentials
+                alert('Invalid username or password');
             }
         } catch (error) {
             console.error('Error during signin:', error);
         }
-
+    
         // Call App.render() or any other necessary functions after signin
         await App.render();
     },
+    
 
 
     renderSignUpFailedScreen: async (message) => {
