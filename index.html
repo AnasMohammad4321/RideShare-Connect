@@ -30,6 +30,20 @@
         <button id="logoutButton">Logout</button>
     </div>
 
+    <!-- Display ride-related fields only when the user is logged in -->
+    <div id="rideSection" style="display: none;">
+        <label for="carRegistration">Car Registration:</label>
+        <input type="text" id="carRegistration" placeholder="Enter your car registration">
+        <br>
+        <label for="numberOfSeats">Number of Seats:</label>
+        <input type="number" id="numberOfSeats" placeholder="Enter the number of seats">
+        <br>
+        <label for="seatPrice">Seat Price:</label>
+        <input type="number" id="seatPrice" placeholder="Enter the seat price">
+        <br>
+        <button onclick="startRide()">Start Ride</button>
+    </div>
+
     <div id="SignUpFailedScreen" style="display: none;">
         <p id="SignUpFailedMessage"></p>
         <button id="TryAgainButton">Try Again</button>
@@ -56,6 +70,10 @@
 
         async function login() {
             await App.signin();
+        }
+        
+        async function startRide() {
+            await App.startRide();
         }
     </script>
 </body>

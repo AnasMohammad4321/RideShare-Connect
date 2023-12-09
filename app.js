@@ -163,25 +163,64 @@ App = {
 
     renderWelcomeScreen: async (message) => {
         // Hide the signup/login screen
-        const authSection = document.getElementById('authSection');
+        let authSection = document.getElementById('authSection');
         authSection.style.display = 'none';
 
         // Load the welcome screen after successful signup
         const welcomeScreen = document.getElementById('welcomeScreen');
         welcomeScreen.style.display = 'block';
-
+    
         // Display the message on the welcome screen
         const welcomeMessage = document.getElementById('welcomeMessage');
         welcomeMessage.innerText = message;
-
+    
         // Display the username on the welcome screen
         const welcomeUsername = document.getElementById('welcomeUsername');
         welcomeUsername.innerText = App.username;
-
+    
         // Add event listener for the logout button
         const logoutButton = document.getElementById('logoutButton');
         logoutButton.addEventListener('click', App.logout);
+    
+
+        App.showRideFields();
+
+    
+        // Hide the signup/login screen
+        authSection = document.getElementById('authSection');
+        authSection.style.display = 'none';
     },
+
+    showRideFields: () => {
+        // Display ride-related fields when the user is a driver
+        const rideSection = document.getElementById('rideSection');
+        rideSection.style.display = 'block';
+    },
+
+    startRide: async () => {
+        try {
+            // Assuming you have HTML elements for these inputs
+            const carRegistration = document.getElementById('carRegistration').value;
+            const numberOfSeats = parseInt(document.getElementById('numberOfSeats').value);
+            const seatPrice = parseInt(document.getElementById('seatPrice').value);
+
+            // Use the ABI directly from the loaded contract
+            const RideShareConnectContract = new web3.eth.Contract(App.contracts.RideShareConnect.abi, App.contracts.RideShareConnect.address);
+
+            // Call the `startRide` method in the smart contract
+            await RideShareConnectContract.methods.startRide(App.username, carRegistration, numberOfSeats, seatPrice).send({ from: App.account });
+
+            console.log('Ride started successfully!');
+
+            // Render the welcome screen with a success message
+            await App.renderWelcomeScreen('Ride started successfully!');
+        } catch (error) {
+            console.error('Error during ride start:', error);
+            // Render the welcome screen with an error message
+            await App.renderWelcomeScreen('Failed to start the ride. Please try again.');
+        }
+    },
+
     
 
     logout: async () => {
