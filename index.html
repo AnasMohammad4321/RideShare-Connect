@@ -44,6 +44,13 @@
         <button onclick="startRide()">Start Ride</button>
     </div>
 
+    <div id="rideDetails" style="display: none;">
+        <p>Ride Details:</p>
+        <p><strong>Car Registration:</strong> <span id="carRegistration"></span></p>
+        <p><strong>Number of Seats:</strong> <span id="numberOfSeats"></span></p>
+        <p><strong>Seat Price:</strong> <span id="seatPrice"></span></p>
+    </div>    
+
     <div id="SignUpFailedScreen" style="display: none;">
         <p id="SignUpFailedMessage"></p>
         <button id="TryAgainButton">Try Again</button>
@@ -71,7 +78,7 @@
         async function login() {
             await App.signin();
         }
-        
+
         async function startRide() {
             await App.startRide();
         }

@@ -161,7 +161,7 @@ App = {
         authSection.style.display = 'none';
     },
 
-    renderWelcomeScreen: async (message) => {
+    renderWelcomeScreen: async (message, rideDetails) => {
         // Hide the signup/login screen
         let authSection = document.getElementById('authSection');
         authSection.style.display = 'none';
@@ -184,6 +184,19 @@ App = {
     
         App.showRideFields();
 
+        // Display ride-related fields if available
+    // Display ride-related fields if available
+    if (rideDetails) {
+        const rideDetailsElement = document.getElementById('rideDetails');
+        rideDetailsElement.style.display = 'block';  // Show the rideDetails div
+        rideDetailsElement.innerHTML = `
+            <p>Ride Details:</p>
+            <p><strong>Car Registration:</strong> ${rideDetails.carRegistration}</p>
+            <p><strong>Number of Seats:</strong> ${rideDetails.numberOfSeats}</p>
+            <p><strong>Seat Price:</strong> ${rideDetails.seatPrice}</p>
+        `;
+    }
+
         // Hide the signup/login screen
         authSection = document.getElementById('authSection');
         authSection.style.display = 'none';
@@ -201,17 +214,24 @@ App = {
             const carRegistration = document.getElementById('carRegistration').value;
             const numberOfSeats = parseInt(document.getElementById('numberOfSeats').value);
             const seatPrice = parseInt(document.getElementById('seatPrice').value);
-
+    
+            // Create rideDetails directly
+            const rideDetails = {
+                carRegistration,
+                numberOfSeats,
+                seatPrice
+            };
+    
             // Use the ABI directly from the loaded contract
             const RideShareConnectContract = new web3.eth.Contract(App.contracts.RideShareConnect.abi, App.contracts.RideShareConnect.address);
-
+    
             // Call the `startRide` method in the smart contract
             await RideShareConnectContract.methods.startRide(App.username, carRegistration, numberOfSeats, seatPrice).send({ from: App.account });
-
+    
             console.log('Ride started successfully!');
-
-            // Render the welcome screen with a success message
-            await App.renderWelcomeScreen('Ride started successfully!');
+    
+            // Render the welcome screen with a success message and ride details
+            await App.renderWelcomeScreen(`Ride started successfully!`, rideDetails);
         } catch (error) {
             console.error('Error during ride start:', error);
             // Render the welcome screen with an error message
