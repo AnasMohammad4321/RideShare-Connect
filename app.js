@@ -182,10 +182,8 @@ App = {
         const logoutButton = document.getElementById('logoutButton');
         logoutButton.addEventListener('click', App.logout);
     
-
         App.showRideFields();
 
-    
         // Hide the signup/login screen
         authSection = document.getElementById('authSection');
         authSection.style.display = 'none';
@@ -221,20 +219,12 @@ App = {
         }
     },
 
-    
-
+    // Modify the logout function to call the resetUI function
     logout: async () => {
-        // Log out the user and navigate back to the signup/login screen
-        const welcomeScreen = document.getElementById('welcomeScreen');
-        welcomeScreen.style.display = 'none';
-
-        // Reset username and account
+        // Log out the user and reset the UI to the default state
         App.username = null;
         App.account = null;
-
-        // Show signup/login screen
-        const authSection = document.getElementById('authSection');
-        authSection.style.display = 'block';
+        resetUI();
 
         // Update MetaMask status
         App.updateMetaMaskStatus();
@@ -266,6 +256,26 @@ App = {
         }
     },
 };
+
+    // Add a function to reset the UI to the default state
+    const resetUI = () => {
+        // Reset the welcome screen
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        welcomeScreen.style.display = 'none';
+
+        // Show the signup/login screen
+        const authSection = document.getElementById('authSection');
+        authSection.style.display = 'block';
+
+        // Hide ride-related fields
+        const rideSection = document.getElementById('rideSection');
+        rideSection.style.display = 'none';
+
+        // Clear input fields
+        document.getElementById('carRegistration').value = '';
+        document.getElementById('numberOfSeats').value = '';
+        document.getElementById('seatPrice').value = '';
+    };
 
 document.addEventListener('DOMContentLoaded', () => {
     App.load();
