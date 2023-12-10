@@ -131,6 +131,32 @@ contract RideShareConnect {
         emit RideBooked(_rideID, _username, _seatsRequired);
     }
 
+    // Event to log ride cancellation
+    // event RideCanceled(uint256 indexed rideID, string driverID);
+    event RideCanceled(string driverID);
+
+    /// Function to cancel a ride
+    function cancelRide() public {
+        // Ensure the sender is the driver who started the ride
+        // require(
+        //     rides[_rideID].driverID == users[msg.sender].username,
+        //     "Only the driver can cancel the ride"
+        // );
+
+        // // Ensure the ride exists
+        // require(rides[_rideID].rideID != 0, "Ride does not exist");
+
+        // // Ensure the ride is not already booked
+        // require(!rides[_rideID].isGoing, "Ride is already booked");
+
+        // // Cancel the ride
+        // delete rides[_rideID];
+
+        // Emit event for ride cancellation
+        // emit RideCanceled(_rideID, users[msg.sender].username);
+        emit RideCanceled(users[msg.sender].username);
+    }
+
     // Function to sign in
     function signin(
         string memory _username,

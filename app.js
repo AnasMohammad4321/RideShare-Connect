@@ -291,8 +291,30 @@ App = {
             await App.renderWelcomeScreen('Failed to book the ride. Please try again.');
         }
     },
-    
 
+    cancelRide: async () => {
+        try {
+            // Get the rideID from the rideDetailsElement dataset
+            const rideDetailsElement = document.getElementById('rideDetails');
+            const rideID = rideDetailsElement.dataset.rideId;
+    
+            // Use the ABI directly from the loaded contract
+            const RideShareConnectContract = new web3.eth.Contract(App.contracts.RideShareConnect.abi, App.contracts.RideShareConnect.address);
+    
+            // Call the `cancelRide` method in the smart contract
+            await RideShareConnectContract.methods.cancelRide().send({ from: App.account });
+    
+            console.log('Ride cancelled successfully!');
+    
+            // Render the welcome screen with a success message, you can customize this based on your needs
+            await App.renderWelcomeScreen('Ride cancelled successfully!');
+        } catch (error) {
+            console.error('Error during ride cancellation:', error);
+            // Render the welcome screen with an error message or take appropriate action
+            await App.renderWelcomeScreen('Failed to cancel the ride. Please try again.');
+        }
+    },
+    
     // Modify the logout function to call the resetUI function
     logout: async () => {
         // Log out the user and reset the UI to the default state
