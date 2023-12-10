@@ -6,7 +6,7 @@ contract RideShareConnect {
     struct User {
         bool isDriver;
         string username;
-        string password; // Note: In a production environment, passwords should be securely hashed.
+        string password;
         string carRegistration;
         uint256 numberOfSeats;
         uint256 seatPrice;
@@ -91,6 +91,44 @@ contract RideShareConnect {
 
         emit UserSignup(msg.sender, _username, true);
         emit RideStarted(rideID, _username);
+    }
+
+    // Event to log ride booking
+    event RideBooked(uint256 rideID, string, uint256 seatsBooked);
+
+    /// Function to book a ride
+    function bookRide(
+        string memory _username,
+        uint256 _seatsRequired,
+        uint256 _rideID
+    ) public {
+        require(bytes(_username).length > 0, "Username cannot be empty");
+        require(
+            _seatsRequired > 0,
+            "Number of seats required must be greater than 0"
+        );
+
+        // Ensure the user is a customer (not a driver)
+        // require(!users[msg.sender].isDriver, "Drivers cannot book rides");
+
+        // Get ride details
+        // Ride storage ride = rides[_rideID];
+
+        // Ensure the ride exists and is not already booked
+        // require(ride.rideID != 0, "Ride does not exist");
+        // require(!ride.isGoing, "Ride is already booked");
+
+        // Ensure there are enough available seats
+        // require(
+        //     _seatsRequired <= users[msg.sender].numberOfSeats,
+        //     "Not enough available seats"
+        // );
+
+        // Book the ride
+        // ride.isGoing = true;
+
+        // Emit event for ride booking
+        emit RideBooked(_rideID, _username, _seatsRequired);
     }
 
     // Function to sign in

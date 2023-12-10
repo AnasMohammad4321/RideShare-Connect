@@ -1,3 +1,6 @@
+
+let rideID = 1;
+
 App = {
     loading: false,
     contracts: {},
@@ -185,17 +188,33 @@ App = {
         App.showRideFields();
 
         // Display ride-related fields if available
-    // Display ride-related fields if available
-    if (rideDetails) {
-        const rideDetailsElement = document.getElementById('rideDetails');
-        rideDetailsElement.style.display = 'block';  // Show the rideDetails div
-        rideDetailsElement.innerHTML = `
-            <p>Ride Details:</p>
-            <p><strong>Car Registration:</strong> ${rideDetails.carRegistration}</p>
-            <p><strong>Number of Seats:</strong> ${rideDetails.numberOfSeats}</p>
-            <p><strong>Seat Price:</strong> ${rideDetails.seatPrice}</p>
-        `;
-    }
+        if (rideDetails) {
+            const rideDetailsElement = document.getElementById('rideDetails');
+            rideDetailsElement.style.display = 'block';  // Show the rideDetails div
+            rideDetailsElement.innerHTML = `
+                <p>Ride Details:</p>
+                <p><strong>Car Registration:</strong> ${rideDetails.carRegistration}</p>
+                <p><strong>Number of Seats:</strong> ${rideDetails.numberOfSeats}</p>
+                <p><strong>Seat Price:</strong> ${rideDetails.seatPrice}</p>
+                <div id="rideButtons">
+                    <div id="bookRideForm">
+                        <label for="username">Username:</label>
+                        <input type="text" id="bookUsername" placeholder="Enter your username">
+                        <br>
+                        <label for="seatsRequired">Seats Required:</label>
+                        <input type="number" id="seatsRequired" placeholder="Enter the number of seats required">
+                        <br>
+                        <button onclick="bookRide()">Book Ride</button>
+                    </div>
+                    <button onclick="cancelRide()">Cancel Ride</button>
+                </div>
+            `;
+
+            // // Store the rideID in a data attribute of the rideDetailsElement
+            // rideDetailsElement.dataset.rideId = rideID;
+            rideID = rideID + 1;
+
+        }
 
         // Hide the signup/login screen
         authSection = document.getElementById('authSection');
@@ -211,12 +230,14 @@ App = {
     startRide: async () => {
         try {
             // Assuming you have HTML elements for these inputs
+            // let rideID = 1
             const carRegistration = document.getElementById('carRegistration').value;
             const numberOfSeats = parseInt(document.getElementById('numberOfSeats').value);
             const seatPrice = parseInt(document.getElementById('seatPrice').value);
     
             // Create rideDetails directly
             const rideDetails = {
+                // rideID,
                 carRegistration,
                 numberOfSeats,
                 seatPrice
@@ -224,12 +245,12 @@ App = {
     
             // Use the ABI directly from the loaded contract
             const RideShareConnectContract = new web3.eth.Contract(App.contracts.RideShareConnect.abi, App.contracts.RideShareConnect.address);
-    
+            // rideID = rideID + 1;
             // Call the `startRide` method in the smart contract
             await RideShareConnectContract.methods.startRide(App.username, carRegistration, numberOfSeats, seatPrice).send({ from: App.account });
-    
+            
             console.log('Ride started successfully!');
-    
+
             // Render the welcome screen with a success message and ride details
             await App.renderWelcomeScreen(`Ride started successfully!`, rideDetails);
         } catch (error) {
@@ -238,6 +259,39 @@ App = {
             await App.renderWelcomeScreen('Failed to start the ride. Please try again.');
         }
     },
+
+    bookRide: async () => {
+        try {
+            // Get the username and seatsRequired from the form
+            const bookUsername = document.getElementById('bookUsername').value;
+            const seatsRequired = parseInt(document.getElementById('seatsRequired').value);
+    
+            // // Get the rideID from the rideDetailsElement dataset
+            // const rideDetailsElement = document.getElementById('rideDetails');
+            // const rideID = rideDetailsElement.dataset.rideId;
+
+            const rideid = rideID;
+            console.log(bookUsername, seatsRequired, rideid);
+    
+            // Use the ABI directly from the loaded contract
+            const RideShareConnectContract = new web3.eth.Contract(App.contracts.RideShareConnect.abi, App.contracts.RideShareConnect.address);
+    
+            // Call the `bookRide` method in the smart contract
+            await RideShareConnectContract.methods.bookRide(bookUsername, seatsRequired, rideid).send({ from: App.account });
+    
+            console.log('Ride booked successfully!');
+    
+            // Render the welcome screen with a success message, you can customize this based on your needs
+            await App.renderWelcomeScreen('Ride booked successfully!');
+
+            
+        } catch (error) {
+            console.error('Error during ride booking:', error);
+            // Render the welcome screen with an error message or take appropriate action
+            await App.renderWelcomeScreen('Failed to book the ride. Please try again.');
+        }
+    },
+    
 
     // Modify the logout function to call the resetUI function
     logout: async () => {
